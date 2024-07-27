@@ -1,7 +1,7 @@
 import React from 'react';
 
-const StateOfCharge = ({ soc = [0] }) => {
-  const socValue = Math.max(0, Math.min(soc[0], 100)); 
+const StateOfCharge = ({ soc = [] }) => {
+  const socValue = soc.length ? Math.round(Math.max(0, Math.min(soc[soc.length - 1], 100))) : 0;
 
   return (
     <div className="card mb-4">
