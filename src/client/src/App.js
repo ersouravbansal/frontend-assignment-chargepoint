@@ -39,7 +39,6 @@ const App = () => {
         updateData(message.payload);
         setLoading(false);
       } else if (message.type === 'overspeed') {
-        console.log("Overspeed event received:", message.payload);
         setOverspeedAlert(true);
         setTimeout(() => setOverspeedAlert(false), 500);
       }
@@ -99,7 +98,7 @@ const App = () => {
         wsRef.current.close();
       }
     };
-  }, [error]);
+  }, []);
 
   return (
     <ErrorBoundary>
