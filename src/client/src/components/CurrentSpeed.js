@@ -3,34 +3,26 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const getColor = (speed) => (speed < 100 ? "#00FF00" : "#FF0000");
 
-const CurrentSpeed = ({ speed = [] }) => {
-  const [alertVisible, setAlertVisible] = useState(false);
+const CurrentSpeed = ({ speed = [], overspeedAlert = false }) => {
+  const [alertVisible, setAlertVisible] = useState(overspeedAlert);
   const currentSpeed = speed.length ? speed[speed.length - 1] : 0;
 
   useEffect(() => {
-    if (currentSpeed > 100) {
+    if (overspeedAlert) {
       setAlertVisible(true);
-      const timer = setTimeout(() => setAlertVisible(false), 200);
+      const timer = setTimeout(() => setAlertVisible(false), 300); 
       return () => clearTimeout(timer);
     }
-  }, [currentSpeed]);
+  }, [overspeedAlert]);
 
   return (
     <div className="card mb-4">
       <div className="card-body">
         <h5 className="card-title">Current Speed</h5>
         {alertVisible && (
-          <div
-            className="alert alert-danger alert-dismissible fade show"
-            role="alert"
-          >
+          <div className="alert alert-danger alert-dismissible fade show" role="alert">
             <strong>Warning!</strong> Speed is above 100 km/h.
-            <button
-              type="button"
-              className="btn-close"
-              aria-label="Close"
-              onClick={() => setAlertVisible(false)}
-            ></button>
+            <button type="button" className="btn-close" aria-label="Close" onClick={() => setAlertVisible(false)}></button>
           </div>
         )}
         <div className="progress no-border-radius mt-3">

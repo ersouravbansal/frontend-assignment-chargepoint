@@ -14,7 +14,8 @@ const EnergyOdometer = lazy(() => import("./components/EnergyOdometer"));
 
 // Constants
 const MAX_LENGTH = 50;
-const DEBOUNCE_TIME = 100;
+const DEBOUNCE_TIME = 50;
+
 const App = () => {
   const [data, setData] = useState({
     time: [],
@@ -26,25 +27,21 @@ const App = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [overspeedAlert, setOverspeedAlert] = useState(false);
   const wsRef = useRef(null);
 
   const connectWebSocket = () => {
     wsRef.current = new WebSocket("ws://localhost:8080/ws");
 
     wsRef.current.onmessage = (event) => {
-      const message = event.data;
-      if (message.startsWith("{") || message.startsWith("[")) {
-        try {
-          const incomingData = JSON.parse(event.data);
-          updateData(incomingData); // Debounced update
-          setLoading(false);
-        } catch (error) {
-          setError(error);
-        }
-      } else if (message.includes("Connected to WebSocket server!")) {
-        console.log("Connected to WebSocket server!");
-      } else {
-        console.log("Received non-JSON message:", message);
+      const message = JSON.parse(event.data);
+      if (message.type === 'data') {
+        updateData(message.payload);
+        setLoading(false);
+      } else if (message.type === 'overspeed') {
+        console.log("Overspeed event received:", message.payload);
+        setOverspeedAlert(true);
+        setTimeout(() => setOverspeedAlert(false), 500);
       }
     };
 
@@ -123,7 +120,7 @@ const App = () => {
             <div className="card flex-fill mb-4">
               <div className="card-body">
                 <Suspense fallback={<div>Loading Current Speed...</div>}>
-                  <CurrentSpeed speed={data.speed} />
+                  <CurrentSpeed speed={data.speed} overspeedAlert={overspeedAlert} />
                 </Suspense>
                 <Suspense fallback={<div>Loading State of Charge...</div>}>
                   <StateOfCharge soc={data.soc} />
