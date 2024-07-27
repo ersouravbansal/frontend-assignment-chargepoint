@@ -1,22 +1,53 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+
+const getColor = (speed) => (speed < 100 ? "#00FF00" : "#FF0000");
 
 const CurrentSpeed = ({ speed = [] }) => {
+  const [alertVisible, setAlertVisible] = useState(false);
   const currentSpeed = speed.length ? speed[speed.length - 1] : 0;
+
+  useEffect(() => {
+    if (currentSpeed > 100) {
+      setAlertVisible(true);
+      const timer = setTimeout(() => setAlertVisible(false), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [currentSpeed]);
 
   return (
     <div className="card mb-4">
       <div className="card-body">
         <h5 className="card-title">Current Speed</h5>
-        <div className="progress no-border-radius">
+        {alertVisible && (
           <div
-            className="progress-bar bg-secondary"
+            className="alert alert-danger alert-dismissible fade show"
+            role="alert"
+          >
+            <strong>Warning!</strong> Speed is above 100 km/h.
+            <button
+              type="button"
+              className="btn-close"
+              aria-label="Close"
+              onClick={() => setAlertVisible(false)}
+            ></button>
+          </div>
+        )}
+        <div className="progress no-border-radius mt-3">
+          <div
+            className="progress-bar"
             role="progressbar"
-            style={{ width: `${currentSpeed}%` }}
+            style={{
+              width: `${Math.min(currentSpeed, 100)}%`,
+              backgroundColor: getColor(currentSpeed),
+            }}
             aria-valuenow={currentSpeed}
             aria-valuemin="0"
             aria-valuemax="100"
           >
-            {isNaN(currentSpeed) ? "0 km/h" : `${currentSpeed} km/h`}
+            <span className="progress-bar-text spd_soc-text">
+              {isNaN(currentSpeed) ? "0 km/h" : `${currentSpeed} km/h`}
+            </span>
           </div>
         </div>
       </div>

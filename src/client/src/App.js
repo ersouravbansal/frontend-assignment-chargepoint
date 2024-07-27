@@ -1,14 +1,8 @@
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-  Suspense,
-  lazy,
-} from "react";
+import React, { useState, useEffect, useMemo, useRef, Suspense, lazy } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+import { debounce } from 'lodash';
 
 // Lazy loading components
 const SpeedChart = lazy(() => import("./components/SpeedChart"));
@@ -18,6 +12,9 @@ const CurrentSpeed = lazy(() => import("./components/CurrentSpeed"));
 const StateOfCharge = lazy(() => import("./components/StateOfCharge"));
 const EnergyOdometer = lazy(() => import("./components/EnergyOdometer"));
 
+// Constants
+const MAX_LENGTH = 50;
+const DEBOUNCE_TIME = 100;
 const App = () => {
   const [data, setData] = useState({
     time: [],
@@ -30,6 +27,7 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const wsRef = useRef(null);
+
   const connectWebSocket = () => {
     wsRef.current = new WebSocket("ws://localhost:8080/ws");
 
@@ -38,19 +36,7 @@ const App = () => {
       if (message.startsWith("{") || message.startsWith("[")) {
         try {
           const incomingData = JSON.parse(event.data);
-
-          setData((prevData) => ({
-            time: [
-              ...prevData.time,
-              new Date(incomingData.time).toLocaleTimeString(),
-            ],
-            energy: [...prevData.energy, incomingData.energy],
-            gps: [...prevData.gps, incomingData.gps],
-            odo: [...prevData.odo, incomingData.odo],
-            speed: [...prevData.speed, incomingData.speed],
-            soc: [...prevData.soc, incomingData.soc],
-          }));
-
+          updateData(incomingData); // Debounced update
           setLoading(false);
         } catch (error) {
           setError(error);
@@ -76,6 +62,18 @@ const App = () => {
       setTimeout(connectWebSocket, 1000);
     };
   };
+
+  const updateData = debounce((newData) => {
+    setData((prevData) => ({
+      time: [...prevData.time.slice(-MAX_LENGTH + 1), new Date(newData.time).toLocaleTimeString()],
+      energy: [...prevData.energy.slice(-MAX_LENGTH + 1), newData.energy],
+      gps: [...prevData.gps.slice(-MAX_LENGTH + 1), newData.gps],
+      odo: [...prevData.odo.slice(-MAX_LENGTH + 1), newData.odo],
+      speed: [...prevData.speed.slice(-MAX_LENGTH + 1), newData.speed],
+      soc: [...prevData.soc.slice(-MAX_LENGTH + 1), newData.soc],
+    }));
+  }, DEBOUNCE_TIME);
+
   const chartData = useMemo(() => {
     if (loading) return <div>Loading...</div>;
     if (!data.time.length) return <div>No data available</div>;
@@ -95,6 +93,7 @@ const App = () => {
       </div>
     );
   }, [data, loading]);
+
   useEffect(() => {
     connectWebSocket();
 
@@ -104,6 +103,7 @@ const App = () => {
       }
     };
   }, [error]);
+
   return (
     <ErrorBoundary>
       <div className="container mt-4">
