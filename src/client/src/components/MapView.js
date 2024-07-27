@@ -6,7 +6,7 @@ import icon from '../images/geo.png';
 import iconShadow from '../images/geo.png';
 
 const MapView = ({ gps }) => {
-  const DefaultIcon = useMemo(() => L.icon({
+  const BaseIcon = useMemo(() => L.icon({
     iconUrl: icon,
     shadowUrl: iconShadow,
   }), []);
@@ -17,7 +17,7 @@ const MapView = ({ gps }) => {
 
   if (isNaN(lat) || isNaN(lng)) return <div>Invalid GPS coordinates</div>;
 
-  L.Marker.prototype.options.icon = DefaultIcon;
+  L.Marker.prototype.options.icon = BaseIcon;
 
   return (
     <MapContainer
