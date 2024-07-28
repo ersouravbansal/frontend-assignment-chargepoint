@@ -3,6 +3,15 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import { debounce } from 'lodash';
+import * as Sentry from '@sentry/react';
+import { BrowserTracing } from '@sentry/tracing';
+
+Sentry.init({
+  dsn: 'https://b3eacded71ff84ad517e1e40b4497452@o4507677877272576.ingest.us.sentry.io/4507677927800832',
+  integrations: [new BrowserTracing()],
+  tracesSampleRate: 1.0,
+});
+
 
 // Lazy loading components
 const SpeedChart = lazy(() => import("./components/SpeedChart"));

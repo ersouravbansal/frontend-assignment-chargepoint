@@ -14,12 +14,20 @@ const ErrorBoundary = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', handleError);
+    const errorHandler = (event) => {
+      handleError(event.error, { componentStack: event.error.stack });
+    };
+
+    const rejectionHandler = (event) => {
+      handleError(event.reason, { componentStack: event.reason.stack });
+    };
+
+    window.addEventListener('error', errorHandler);
+    window.addEventListener('unhandledrejection', rejectionHandler);
 
     return () => {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleError);
+      window.removeEventListener('error', errorHandler);
+      window.removeEventListener('unhandledrejection', rejectionHandler);
     };
   }, [handleError]);
 
