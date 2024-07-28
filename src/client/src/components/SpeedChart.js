@@ -39,7 +39,7 @@ const SpeedChart = ({ time = [], speed = [] }) => {
   };
 
   return (
-    <div className="col-md-12">
+    <div className="col-md-12 pt-3" style={{height: "400px"}}>
       <h2 className="mb-3">Speed Profile</h2>
       <Line data={data} options={options} />
     </div>

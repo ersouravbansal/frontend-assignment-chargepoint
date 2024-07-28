@@ -47,7 +47,7 @@ const SocChart = ({ time = [], soc = [] }) => {
     },
   }
   return (
-    <div className="col-md-12">
+    <div className="col-md-12 pt-3" style={{height: "400px"}}>
       <h2 className="mb-3">State of Charge Profile</h2>
       <Line data={data} options={options} />
     </div>
