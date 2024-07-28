@@ -24,7 +24,7 @@ class Broadcaster extends EventEmitter {
               if (!this.broadcasting) return cb();
 
               setTimeout(() => {
-                if (obj.speed > 100) {
+                if (obj.speed > 30) {
                   this.emit("overspeed", obj);
                 } else {
                   this.emit("data", obj);

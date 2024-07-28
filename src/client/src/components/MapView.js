@@ -13,7 +13,7 @@ const MapView = ({ gps }) => {
 
   if (!gps.length) return null;
 
-  const [lat, lng] = gps[0].split(',').map(Number);
+  const [lat, lng] = gps[0].split('|').map(parseFloat);
 
   if (isNaN(lat) || isNaN(lng)) return <div>Invalid GPS coordinates</div>;
 

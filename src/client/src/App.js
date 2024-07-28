@@ -22,7 +22,7 @@ const EnergyOdometer = lazy(() => import("./components/EnergyOdometer"));
 
 // Constants
 const MAX_LENGTH = 50;
-const DEBOUNCE_TIME = 50;
+const DEBOUNCE_TIME = 10;
 
 const App = () => {
   const [data, setData] = useState({

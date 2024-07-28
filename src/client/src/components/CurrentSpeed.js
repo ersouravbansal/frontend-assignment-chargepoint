@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const getColor = (speed) => (speed < 100 ? "#00FF00" : "#FF0000");
+const getColor = (speed) => (speed < 30 ? "#00FF00" : "#FF0000");
 
 const CurrentSpeed = ({ speed = [], overspeedAlert = false }) => {
   const [alertVisible, setAlertVisible] = useState(overspeedAlert);
@@ -9,8 +9,9 @@ const CurrentSpeed = ({ speed = [], overspeedAlert = false }) => {
 
   useEffect(() => {
     if (overspeedAlert) {
+      console.log("overspeeding")
       setAlertVisible(true);
-      const timer = setTimeout(() => setAlertVisible(false), 300); 
+      const timer = setTimeout(() => setAlertVisible(false), 1000); 
       return () => clearTimeout(timer);
     }
   }, [overspeedAlert]);
@@ -21,7 +22,7 @@ const CurrentSpeed = ({ speed = [], overspeedAlert = false }) => {
         <h5 className="card-title">Current Speed</h5>
         {alertVisible && (
           <div className="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>Warning!</strong> Speed is above 100 km/h.
+            <strong>Warning!</strong> Speed Alert! is above 30 km/h.
             <button type="button" className="btn-close" aria-label="Close" onClick={() => setAlertVisible(false)}></button>
           </div>
         )}
