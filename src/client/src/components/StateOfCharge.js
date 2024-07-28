@@ -29,9 +29,6 @@ const StateOfCharge = ({ soc = [] }) => {
           >
             <span
               className="progress-bar-text spd_soc-text"
-              style={{
-                color: socValue < 50 ? '#FFFFFF' : '#000000',
-              }}
             >
               {isNaN(socValue) ? 0 : socValue}%
             </span>
