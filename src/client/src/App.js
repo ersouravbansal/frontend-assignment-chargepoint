@@ -12,7 +12,6 @@ Sentry.init({
   tracesSampleRate: 1.0,
 });
 
-
 // Lazy loading components
 const SpeedChart = lazy(() => import("./components/SpeedChart"));
 const SocChart = lazy(() => import("./components/SocChart"));
@@ -38,6 +37,8 @@ const App = () => {
   const [error, setError] = useState(null);
   const [overspeedAlert, setOverspeedAlert] = useState(false);
   const wsRef = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
+  const alertTimeoutRef = useRef(null);
 
   const connectWebSocket = () => {
     wsRef.current = new WebSocket("ws://localhost:8080/ws");
@@ -49,14 +50,20 @@ const App = () => {
         setLoading(false);
       } else if (message.type === 'overspeed') {
         setOverspeedAlert(true);
-        setTimeout(() => setOverspeedAlert(false), 500);
+        if (alertTimeoutRef.current) {
+          clearTimeout(alertTimeoutRef.current);
+        }
+        alertTimeoutRef.current = setTimeout(() => setOverspeedAlert(false), 1000);
       }
     };
 
     wsRef.current.onerror = () => {
       if (wsRef.current.readyState !== WebSocket.OPEN) {
         wsRef.current.close();
-        setTimeout(connectWebSocket, 1000);
+        if (reconnectTimeoutRef.current) {
+          clearTimeout(reconnectTimeoutRef.current);
+        }
+        reconnectTimeoutRef.current = setTimeout(connectWebSocket, 1000);
       }
     };
 
@@ -64,7 +71,10 @@ const App = () => {
       if (!error) {
         setError("WebSocket connection closed");
       }
-      setTimeout(connectWebSocket, 1000);
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      reconnectTimeoutRef.current = setTimeout(connectWebSocket, 1000);
     };
   };
 
@@ -105,6 +115,12 @@ const App = () => {
     return () => {
       if (wsRef.current) {
         wsRef.current.close();
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      if (alertTimeoutRef.current) {
+        clearTimeout(alertTimeoutRef.current);
       }
     };
   }, []);
