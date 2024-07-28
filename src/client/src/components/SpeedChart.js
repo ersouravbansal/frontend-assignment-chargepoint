@@ -37,7 +37,12 @@ const SpeedChart = ({ time = [], speed = [] }) => {
     },
   };
 
-  return <Line data={data} options={options} />;
+  return (
+    <div className="col-md-12">
+      <h2 className="mb-3">Speed Profile</h2>
+      <Line data={data} options={options} />
+    </div>
+  )
 };
 
 export default SpeedChart;
