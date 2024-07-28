@@ -1,34 +1,21 @@
-import React, { useState, useEffect, useMemo, useRef, Suspense, lazy } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
-import { debounce } from 'lodash';
-import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/tracing';
-
-Sentry.init({
-  dsn: 'https://b3eacded71ff84ad517e1e40b4497452@o4507677877272576.ingest.us.sentry.io/4507677927800832',
-  integrations: [new BrowserTracing()],
-  tracesSampleRate: 1.0,
-});
-
-// Lazy loading components
-const SpeedChart = lazy(() => import("./components/SpeedChart"));
-const SocChart = lazy(() => import("./components/SocChart"));
-const MapView = lazy(() => import("./components/MapView"));
-const CurrentSpeed = lazy(() => import("./components/CurrentSpeed"));
-const StateOfCharge = lazy(() => import("./components/StateOfCharge"));
-const EnergyOdometer = lazy(() => import("./components/EnergyOdometer"));
+import SpeedChart from "./components/SpeedChart";
+import SocChart from "./components/SocChart";
+import MapView from "./components/MapView";
+import CurrentSpeed from "./components/CurrentSpeed";
+import StateOfCharge from "./components/StateOfCharge";
+import EnergyOdometer from "./components/EnergyOdometer";
 
 // Constants
 const MAX_LENGTH = 50;
-const DEBOUNCE_TIME = 10;
 
 const App = () => {
   const [data, setData] = useState({
     time: [],
     energy: [],
-    gps: [],
     odo: [],
     speed: [],
     soc: [],
@@ -39,21 +26,25 @@ const App = () => {
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
   const alertTimeoutRef = useRef(null);
-
+  const [currentPosition, setCurrentPosition] = useState(null);
   const connectWebSocket = () => {
     wsRef.current = new WebSocket("ws://localhost:8080/ws");
 
     wsRef.current.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      if (message.type === 'data') {
+      if (message.type === "data") {
         updateData(message.payload);
         setLoading(false);
-      } else if (message.type === 'overspeed') {
+      } else if (message.type === "overspeed") {
         setOverspeedAlert(true);
+        updateData(message.payload);
         if (alertTimeoutRef.current) {
           clearTimeout(alertTimeoutRef.current);
         }
-        alertTimeoutRef.current = setTimeout(() => setOverspeedAlert(false), 1000);
+        alertTimeoutRef.current = setTimeout(
+          () => setOverspeedAlert(false),
+          1000
+        );
       }
     };
 
@@ -78,36 +69,19 @@ const App = () => {
     };
   };
 
-  const updateData = debounce((newData) => {
+  const updateData = (newData) => {
+    setCurrentPosition(newData.gps.split("|").map(parseFloat))
     setData((prevData) => ({
-      time: [...prevData.time.slice(-MAX_LENGTH + 1), new Date(newData.time).toLocaleTimeString()],
+      time: [
+        ...prevData.time.slice(-MAX_LENGTH + 1),
+        new Date(newData.time).toLocaleTimeString(),
+      ],
       energy: [...prevData.energy.slice(-MAX_LENGTH + 1), newData.energy],
-      gps: [...prevData.gps.slice(-MAX_LENGTH + 1), newData.gps],
       odo: [...prevData.odo.slice(-MAX_LENGTH + 1), newData.odo],
       speed: [...prevData.speed.slice(-MAX_LENGTH + 1), newData.speed],
       soc: [...prevData.soc.slice(-MAX_LENGTH + 1), newData.soc],
     }));
-  }, DEBOUNCE_TIME);
-
-  const chartData = useMemo(() => {
-    if (loading) return <div>Loading...</div>;
-    if (!data.time.length) return <div>No data available</div>;
-
-    return (
-      <div className="row mt-4">
-        <div className="col-md-6">
-          <Suspense fallback={<div>Loading Speed Chart...</div>}>
-            <SpeedChart time={data.time} speed={data.speed} />
-          </Suspense>
-        </div>
-        <div className="col-md-6">
-          <Suspense fallback={<div>Loading SOC Chart...</div>}>
-            <SocChart time={data.time} soc={data.soc} />
-          </Suspense>
-        </div>
-      </div>
-    );
-  }, [data, loading]);
+  };
 
   useEffect(() => {
     connectWebSocket();
@@ -134,29 +108,33 @@ const App = () => {
             <div className="card flex-fill mb-4">
               <div className="card-body">
                 <h5 className="card-title">Location</h5>
-                <Suspense fallback={<div>Loading Map View...</div>}>
-                  <MapView gps={data.gps} />
-                </Suspense>
+                <MapView currentPosition= {currentPosition}/>
               </div>
             </div>
           </div>
           <div className="col-md-6 d-flex flex-column">
             <div className="card flex-fill mb-4">
               <div className="card-body">
-                <Suspense fallback={<div>Loading Current Speed...</div>}>
-                  <CurrentSpeed speed={data.speed} overspeedAlert={overspeedAlert} />
-                </Suspense>
-                <Suspense fallback={<div>Loading State of Charge...</div>}>
-                  <StateOfCharge soc={data.soc} />
-                </Suspense>
-                <Suspense fallback={<div>Loading Energy Odometer...</div>}>
-                  <EnergyOdometer energy={data.energy} odo={data.odo} />
-                </Suspense>
+                <CurrentSpeed
+                  speed={data.speed}
+                  overspeedAlert={overspeedAlert}
+                />
+                <StateOfCharge soc={data.soc} />
+                <EnergyOdometer energy={data.energy} odo={data.odo} />
               </div>
             </div>
           </div>
         </div>
-        {chartData}
+        <div className="row mt-4">
+          <div className="col-md-12">
+            <SpeedChart time={data.time} speed={data.speed} />
+          </div>
+        </div>
+        <div className="row mt-4">
+          <div className="col-md-12">
+            <SocChart time={data.time} soc={data.soc} />
+          </div>
+        </div>
       </div>
     </ErrorBoundary>
   );

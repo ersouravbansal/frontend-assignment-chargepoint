@@ -1,12 +1,11 @@
-import { EventEmitter } from "events";
-import { parse as csvParse } from "csv-parse";
-import fs from "fs";
-import { Writable } from "stream";
+const EventEmitter = require("events").EventEmitter;
+const csvParse = require("csv-parse");
+const fs = require("fs");
+const Writable = require("stream").Writable;
 
 class Broadcaster extends EventEmitter {
   constructor() {
     super();
-    this.broadcasting = false;
   }
 
   start() {
@@ -16,13 +15,18 @@ class Broadcaster extends EventEmitter {
       const fileStream = fs.createReadStream("./meta/route.csv");
 
       fileStream
-        .pipe(csvParse({ delimiter: ",", columns: true, cast: true }))
+        // Filestream piped to csvParse which accept nodejs readablestreams and parses each line to a JSON object
+        .pipe(csvParse.parse({ delimiter: ",", columns: true, cast: true }))
+        // Then it is piped to a writable streams that will push it into nats
         .pipe(
           new Writable({
             objectMode: true,
             write: (obj, enc, cb) => {
               if (!this.broadcasting) return cb();
 
+              // setTimeout in this case is there to emulate real life situation
+              // data that came out of the vehicle came in with irregular interval
+              // Hence the Math.random() on the second parameter
               setTimeout(() => {
                 if (obj.speed > 30) {
                   this.emit("overspeed", obj);
@@ -41,6 +45,7 @@ class Broadcaster extends EventEmitter {
             broadcast();
           } else {
             console.log("Stopped broadcast");
+            return;
           }
         });
     };
@@ -52,4 +57,4 @@ class Broadcaster extends EventEmitter {
   }
 }
 
-export default Broadcaster;
+module.exports = Broadcaster;

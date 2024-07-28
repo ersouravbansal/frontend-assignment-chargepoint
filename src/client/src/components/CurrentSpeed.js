@@ -18,10 +18,10 @@ const CurrentSpeed = ({ speed = [], overspeedAlert = false }) => {
 
   return (
     <div className="card mb-4">
-      <div className="card-body">
+      <div className="card-body position-relative">
         <h5 className="card-title">Current Speed</h5>
         {alertVisible && (
-          <div className="alert alert-danger alert-dismissible fade show" role="alert">
+          <div className="alert alert-danger alert-dismissible fade show position-absolute align-rt" role="alert">
             <strong>Warning!</strong> Speed Alert! is above 30 km/h.
             <button type="button" className="btn-close" aria-label="Close" onClick={() => setAlertVisible(false)}></button>
           </div>

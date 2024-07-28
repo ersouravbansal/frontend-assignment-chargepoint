@@ -1,16 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import * as Sentry from '@sentry/react';
-
-const logErrorToMyService = (error, errorInfo) => {
-  Sentry.captureException(error, { extra: errorInfo });
-};
+import React, { useState, useEffect, useCallback } from "react";
 
 const ErrorBoundary = ({ children }) => {
   const [hasError, setHasError] = useState(false);
 
   const handleError = useCallback((error, errorInfo) => {
-    logErrorToMyService(error, errorInfo);
     setHasError(true);
+    console.log("error:", error, "error info:", errorInfo);
   }, []);
 
   useEffect(() => {
@@ -22,12 +17,12 @@ const ErrorBoundary = ({ children }) => {
       handleError(event.reason, { componentStack: event.reason.stack });
     };
 
-    window.addEventListener('error', errorHandler);
-    window.addEventListener('unhandledrejection', rejectionHandler);
+    window.addEventListener("error", errorHandler);
+    window.addEventListener("unhandledrejection", rejectionHandler);
 
     return () => {
-      window.removeEventListener('error', errorHandler);
-      window.removeEventListener('unhandledrejection', rejectionHandler);
+      window.removeEventListener("error", errorHandler);
+      window.removeEventListener("unhandledrejection", rejectionHandler);
     };
   }, [handleError]);
 

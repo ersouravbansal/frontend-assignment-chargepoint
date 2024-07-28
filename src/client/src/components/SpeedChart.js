@@ -20,6 +20,7 @@ const SpeedChart = ({ time = [], speed = [] }) => {
 
   const options = {
     responsive: true,
+    animation:{duration:50},
     scales: {
       x: {
         title: {

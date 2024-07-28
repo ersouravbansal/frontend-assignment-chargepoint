@@ -1,17 +1,40 @@
 {
-  "name": "vue-assignment",
+  "name": "sourav-react-assignment",
   "version": "1.0.0",
   "description": "![ ](https://imgs.xkcd.com/comics/code_quality_3.png)",
   "main": "index.js",
   "scripts": {
+    "build": "cd src/client && npm run build",
     "start": "node src/server/app.js"
   },
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "uuid": "^9.0.1"
+  },
   "devDependencies": {
-    "csv-parse": "^4.0.1",
-    "express": "^4.16.4",
+    "csv-parse": "^5.5.6",
+    "express": "^4.19.2",
     "pug": "^2.0.3",
-    "ws": "^6.1.2"
+    "ws": "^8.18.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

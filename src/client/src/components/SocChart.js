@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart, CategoryScale, PointElement, LineController, LineElement, Title, Tooltip, Legend, LinearScale, Filler } from 'chart.js';
 
@@ -15,7 +15,7 @@ Chart.register(
 );
 
 const SocChart = ({ time = [], soc = [] }) => {
-  const data = useMemo(() => ({
+  const data = {
     labels: time,
     datasets: [
       {
@@ -26,9 +26,10 @@ const SocChart = ({ time = [], soc = [] }) => {
         fill: false,
       },
     ],
-  }), [time, soc]);
-
-  const options = useMemo(() => ({
+  }
+  const options = {
+    responsive: true,
+    animation:{duration:50},
     scales: {
       y: {
         beginAtZero: true,
@@ -44,8 +45,7 @@ const SocChart = ({ time = [], soc = [] }) => {
         },
       },
     },
-  }), []);
-
+  }
   return (
     <div className="col-md-12">
       <h2 className="mb-3">State of Charge Profile</h2>
