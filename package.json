@@ -1,6 +1,6 @@
 {
   "name": "sourav-react-assignment",
-  "version": "1.0.0",
+  "version": "1.1",
   "description": "![ ](https://imgs.xkcd.com/comics/code_quality_3.png)",
   "main": "index.js",
   "scripts": {
@@ -21,8 +21,7 @@
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ]
   },
   "browserslist": {

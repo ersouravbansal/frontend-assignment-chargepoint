@@ -80,3 +80,19 @@ Looking to level up your knowledge and skills? These are some good articles/cour
 If you have any questions about the assignment or project setup feel free to contact us at <a href='mailto:enrique.tamames@chargepoint.com'>enrique.tamames@chargepoint.com</a> or <a href='mailto:marco.vanharten@chargepoint.com'>marco.vanharten@chargepoint.com</a>. You can also come by the office. We're always ready to help.
 
 Good luck with the assignment!
+
+# Quick Notes:- 
+** Ensure that you have installed all the node modules by command 
+`npm install`
+
+## To RUN THE BUILD
+if no build created
+`npm run build`
+Then
+`npm run start`
+
+## To run development Environment
+`cd src/client`
+`npm run start`
+
+### Happy Coding!
