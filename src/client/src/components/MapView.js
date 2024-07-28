@@ -11,10 +11,9 @@ const BaseIcon = L.icon({
 });
 
 const MapView = ({ currentPosition }) => {
-
   if (!currentPosition?.length) return null;
 
-  const [lat, lng] = currentPosition
+  const [lat, lng] = currentPosition;
 
   if (isNaN(lat) || isNaN(lng)) return <div>Invalid GPS coordinates</div>;
 

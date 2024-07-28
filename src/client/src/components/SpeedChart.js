@@ -1,18 +1,33 @@
-import React from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, Tooltip, Legend, Filler } from 'chart.js';
+import React from "react";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  Filler,
+} from "chart.js";
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, Tooltip, Legend, Filler);
+ChartJS.register(
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 const SpeedChart = ({ time = [], speed = [] }) => {
   const data = {
     labels: time,
     datasets: [
       {
-        label: 'Speed',
+        label: "Speed",
         data: speed,
-        borderColor: 'rgba(75,192,192,1)',
-        backgroundColor: 'rgba(75,192,192,0.2)',
+        borderColor: "rgba(75,192,192,1)",
+        backgroundColor: "rgba(75,192,192,0.2)",
         fill: true,
       },
     ],
@@ -20,18 +35,18 @@ const SpeedChart = ({ time = [], speed = [] }) => {
 
   const options = {
     responsive: true,
-    animation:{duration:50},
+    animation: { duration: 50 },
     scales: {
       x: {
         title: {
           display: true,
-          text: 'Time',
+          text: "Time",
         },
       },
       y: {
         title: {
           display: true,
-          text: 'Speed (km/h)',
+          text: "Speed (km/h)",
         },
         beginAtZero: true,
       },
@@ -39,11 +54,11 @@ const SpeedChart = ({ time = [], speed = [] }) => {
   };
 
   return (
-    <div className="col-md-12 pt-3" style={{height: "400px"}}>
+    <div className="col-md-12 pt-3" style={{ height: "400px" }}>
       <h2 className="mb-3">Speed Profile</h2>
       <Line data={data} options={options} />
     </div>
-  )
+  );
 };
 
 export default SpeedChart;

@@ -13,20 +13,20 @@ import EnergyOdometer from "./components/EnergyOdometer";
 const MAX_LENGTH = 50;
 
 const App = () => {
-  const [data, setData] = useState({
-    time: [],
-    energy: [],
-    odo: [],
-    speed: [],
-    soc: [],
-  });
+  const [time, setTime] = useState([]);
+  const [energy, setEnergy] = useState([]);
+  const [currentPosition, setCurrentPosition] = useState(null);
+  const [odo, setOdo] = useState([]);
+  const [speed, setSpeed] = useState([]);
+  const [soc, setSoc] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [overspeedAlert, setOverspeedAlert] = useState(false);
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
   const alertTimeoutRef = useRef(null);
-  const [currentPosition, setCurrentPosition] = useState(null);
+
+
   const connectWebSocket = () => {
     wsRef.current = new WebSocket("ws://localhost:8080/ws");
 
@@ -70,17 +70,32 @@ const App = () => {
   };
 
   const updateData = (newData) => {
-    setCurrentPosition(newData.gps.split("|").map(parseFloat))
-    setData((prevData) => ({
-      time: [
-        ...prevData.time.slice(-MAX_LENGTH + 1),
-        new Date(newData.time).toLocaleTimeString(),
-      ],
-      energy: [...prevData.energy.slice(-MAX_LENGTH + 1), newData.energy],
-      odo: [...prevData.odo.slice(-MAX_LENGTH + 1), newData.odo],
-      speed: [...prevData.speed.slice(-MAX_LENGTH + 1), newData.speed],
-      soc: [...prevData.soc.slice(-MAX_LENGTH + 1), newData.soc],
-    }));
+    setCurrentPosition(newData.gps.split("|").map(parseFloat));
+
+    setTime((prevTime) => [
+      ...prevTime.slice(-MAX_LENGTH + 1),
+      new Date(newData.time).toLocaleTimeString(),
+    ]);
+
+    setEnergy((prevEnergy) => [
+      ...prevEnergy.slice(-MAX_LENGTH + 1),
+      newData.energy,
+    ]);
+
+    setOdo((prevOdo) => [
+      ...prevOdo.slice(-MAX_LENGTH + 1),
+      newData.odo,
+    ]);
+
+    setSpeed((prevSpeed) => [
+      ...prevSpeed.slice(-MAX_LENGTH + 1),
+      newData.speed,
+    ]);
+
+    setSoc((prevSoc) => [
+      ...prevSoc.slice(-MAX_LENGTH + 1),
+      newData.soc,
+    ]);
   };
 
   useEffect(() => {
@@ -108,31 +123,28 @@ const App = () => {
             <div className="card flex-fill mb-4">
               <div className="card-body">
                 <h5 className="card-title">Location</h5>
-                <MapView currentPosition= {currentPosition}/>
+                <MapView currentPosition={currentPosition} />
               </div>
             </div>
           </div>
           <div className="col-md-6 d-flex flex-column">
             <div className="card flex-fill mb-4">
               <div className="card-body">
-                <CurrentSpeed
-                  speed={data.speed}
-                  overspeedAlert={overspeedAlert}
-                />
-                <StateOfCharge soc={data.soc} />
-                <EnergyOdometer energy={data.energy} odo={data.odo} />
+                <CurrentSpeed speed={speed} overspeedAlert={overspeedAlert} />
+                <StateOfCharge soc={soc} />
+                <EnergyOdometer energy={energy} odo={odo} />
               </div>
             </div>
           </div>
         </div>
         <div className="row mt-4">
           <div className="col-md-12">
-            <SpeedChart time={data.time} speed={data.speed} />
+            <SpeedChart time={time} speed={speed} />
           </div>
         </div>
         <div className="row mt-4">
           <div className="col-md-12">
-            <SocChart time={data.time} soc={data.soc} />
+            <SocChart time={time} soc={soc} />
           </div>
         </div>
       </div>

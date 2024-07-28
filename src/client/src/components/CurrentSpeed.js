@@ -9,9 +9,9 @@ const CurrentSpeed = ({ speed = [], overspeedAlert = false }) => {
 
   useEffect(() => {
     if (overspeedAlert) {
-      console.log("overspeeding")
+      console.log("overspeeding");
       setAlertVisible(true);
-      const timer = setTimeout(() => setAlertVisible(false), 1000); 
+      const timer = setTimeout(() => setAlertVisible(false), 1000);
       return () => clearTimeout(timer);
     }
   }, [overspeedAlert]);
@@ -21,9 +21,17 @@ const CurrentSpeed = ({ speed = [], overspeedAlert = false }) => {
       <div className="card-body position-relative">
         <h5 className="card-title">Current Speed</h5>
         {alertVisible && (
-          <div className="alert alert-danger alert-dismissible fade show position-absolute align-rt alt-fmt" role="alert">
+          <div
+            className="alert alert-danger alert-dismissible fade show position-absolute align-rt alt-fmt"
+            role="alert"
+          >
             <strong>Warning!</strong> Speed Alert! is above 30 km/h.
-            <button type="button" className="btn-close" aria-label="Close" onClick={() => setAlertVisible(false)}></button>
+            <button
+              type="button"
+              className="btn-close"
+              aria-label="Close"
+              onClick={() => setAlertVisible(false)}
+            ></button>
           </div>
         )}
         <div className="progress no-border-radius mt-3">
